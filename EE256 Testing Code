@@ -1,0 +1,35 @@
+import board
+import busio
+import adafruit_max9744
+import digitalio
+import time
+import array
+import math
+import audiocore
+import audiobusio
+
+wave_file = open("StreetChicken.wav", "rb")
+wave = audiocore.WaveFile(wave_file)
+audio = audiobusio.I2SOut(board.D1, board.D10, board.D11)
+
+# VDDIO
+vddio = digitalio.DigitalInOut(board.D9)
+vddio.direction = digitalio.Direction.OUTPUT
+vddio.value = True         # Provide Logic High
+
+# Initialize I2C bus.
+i2c = busio.I2C(board.SCL, board.SDA)
+print("i2c Initiated")
+
+# Initialize amplifier.
+amp = adafruit_max9744.MAX9744(i2c)
+print("amplifier object initiated")
+
+# Setting the volume is as easy as writing to the volume property (note
+# you cannot read the property so keep track of volume in your own code if
+# you need it).
+amp.volume = 25  # Volume is a value from 0 to 63 where 0 is muted/off and
+# 63 is maximum volume.
+print("volume set")
+
+audio.play(wave, loop=True)
